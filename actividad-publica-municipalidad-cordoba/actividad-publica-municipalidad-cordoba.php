@@ -220,14 +220,14 @@ class ActividadesMuniCordoba
 			return [ 'results' => [], 'error' => 'Ocurri&oacute; un error al cargar '.$tipoObjeto.'.' ];
 		} else {
 			$respuesta = json_decode( wp_remote_retrieve_body( $api_response ), true );
-			set_transient('api_muni_cba_'.$nombre_transient, $respuesta, HOUR_IN_SECONDS );
+			set_site_transient('api_muni_cba_'.$nombre_transient, $respuesta, HOUR_IN_SECONDS );
 			return $respuesta;
 		}
 	}
 	
 	private function buscar_transient($nombre_transient)
 	{
-		$transient = get_transient('api_muni_cba_'.$nombre_transient);
+		$transient = get_site_transient('api_muni_cba_'.$nombre_transient);
 		$api_response = null;
 		$resultado = null;
 		if(!empty($transient)) {
