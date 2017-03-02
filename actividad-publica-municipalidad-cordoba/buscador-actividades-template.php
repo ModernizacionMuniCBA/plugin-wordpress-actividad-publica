@@ -12,10 +12,28 @@ $eventos = $_POST['datos']['eventos']['results'];
 $lugares = $_POST['datos']['lugares']['results'];
 $actividades = $_POST['datos']['actividades']['results'];
 
+global $post;
+$color_buscador = get_post_meta($post->ID, 'color-buscador', true );
+$logo_buscador = get_post_meta($post->ID, 'logo-buscador', true );
+$logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images/logo-horizontal-blanco.png";
+
 ?>
 
-<div id="main-content" class="main-content">
+<?php if (!is_null($color_buscador)) : ?>
+<style>
+#bmc .c-sidebar__header,
+#bmc .c-sidebar__barra-superior {
+    background-color: <?php echo $color_buscador; ?>;
+}
 
+#bmc .o-actividad__titulo,
+#bmc .c-atras,
+#bmc .c-atras:hover {
+	color: <?php echo $color_buscador; ?>;
+}
+</style>
+<?php endif; ?>
+<div id="main-content" class="main-content">
 	<div id="primary" class="content-area">
 		<div id="content" class="site-content" role="main">
 			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -23,14 +41,9 @@ $actividades = $_POST['datos']['actividades']['results'];
 					while ( have_posts() ) : the_post();
 						global $more;
 						$more = 1;
-				?>
-					<h1 class="page-title"><?=the_title();?></h1>
-					<div <?=body_class();?>>
-				<?php
 						the_content();
 					endwhile;
 				?>
-				</div>
 				<div id="bmc" class="c-buscador">
 					<div class="c-buscador__cuerpo">
 						<div class="c-buscador__contenido">
@@ -67,16 +80,16 @@ $actividades = $_POST['datos']['actividades']['results'];
 						</div>
 						<div class="c-mensaje"><p></p><a class="c-atras" href="#">Atrás</a></div>
 					</div>
+					<a id="volver-ver-todo" class="c-atras c-ver-todo" href="#">Volver</a>
 					
 					<div class="l-contenedor-sidebar">
 					<!-- Barra lateral -->
 						<aside class="c-sidebar" role="navigation">
 						<div class="c-sidebar__header">
-							<div class="c-sidebar__barra-superior"></div>
 							<button class="c-sidebar__toggle">
 								<span class="c-cruz c-cruz--fino"></span>
 							</button>
-							<img class="c-sidebar__imagen" src="<?=$_POST['URL_PLUGIN']."/images/logo-horizontal-blanco.png"?>">
+							<img class="c-sidebar__imagen" src="<?=$logo_buscador?>">
 						</div>
 						<ul class="c-sidebar__nav">
 							<li class="c-dropdown">

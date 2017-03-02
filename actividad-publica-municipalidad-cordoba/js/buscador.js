@@ -14,6 +14,7 @@ window.BMC = (function(window, document, $) {
         app.$els.$particular = app.$els.$BMC.find('.c-actividades--particular');
         app.$els.$loader = app.$els.$BMC.find('.c-loading');
         app.$els.$mensaje = app.$els.$BMC.find('.c-mensaje');
+		app.$els.$verTodo = app.$els.$BMC.find('#volver-ver-todo');
         app.$els.$twitter = app.$els.$particular.find('.c-social__boton--twitter');
         app.$els.$facebook = app.$els.$particular.find('.c-social__boton--facebook');
 
@@ -83,6 +84,7 @@ window.BMC = (function(window, document, $) {
                 app.$els.$listaActividades.show();
                 app.$els.$mensaje.hide();
                 app.$els.$actividades.fadeIn();
+				app.$els.$verTodo.hide();
             }
         };
 
@@ -97,7 +99,7 @@ window.BMC = (function(window, document, $) {
                 $particular.find('.o-actividad--particular').attr('data-id', datos.id);
                 $particular.find('.o-actividad__titulo').html(datos.titulo);
                 datos.descripcion ? $particular.find('.o-actividad__descripcion').html(datos.descripcion) : $particular.find('.o-actividad__descripcion').html('');
-                datos.imagen != '' && $particular.find('img').attr('src', datos.imagen);
+                datos.imagen != '' ? $particular.find('img').attr('src', datos.imagen.thumbnail) : $particular.find('img').attr('src', buscarActividad.imagen);
 
                 datos.agrupador ? $particular.find('.o-actividad__evento').html('<b>' + datos.agrupador.nombre + '<b>').show() : $particular.find('.o-actividad__evento').html('').hide();
 
@@ -222,6 +224,7 @@ window.BMC = (function(window, document, $) {
             } else {
                 app.sinResultados = false;
                 app.eventos.toggleLoader()
+				app.$els.$verTodo.show();
             }
 
             app.eventos.toggleSidebar();
@@ -255,6 +258,7 @@ window.BMC = (function(window, document, $) {
         // Eventos de filtrado
         app.$els.$document.on('click', '.c-dropdown__item', app.eventos.filtrar);
         app.$els.$document.on('click', '#ver-todo', app.eventos.mostrarTodasActividades);
+		app.$els.$document.on('click', '#volver-ver-todo', app.eventos.mostrarTodasActividades);
 
         // Si viene un id por GET, busca esa actividad
         if (buscarActividad.actividad !== undefined) {
