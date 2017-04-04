@@ -17,6 +17,8 @@ window.BMC = (function(window, document, $) {
 		app.$els.$verTodo = app.$els.$BMC.find('#volver-ver-todo');
         app.$els.$twitter = app.$els.$particular.find('.c-social__boton--twitter');
         app.$els.$facebook = app.$els.$particular.find('.c-social__boton--facebook');
+        app.$els.$link = app.$els.$particular.find('.c-social__boton--link');
+        app.$els.$inputLink = app.$els.$particular.find('.c-social__link');
 
         app.url = window.location.protocol + "//" + window.location.hostname + window.location.pathname;
         app.idAnterior = 1;
@@ -83,6 +85,7 @@ window.BMC = (function(window, document, $) {
                 app.$els.$particular.hide();
                 app.$els.$listaActividades.show();
                 app.$els.$mensaje.hide();
+                app.$els.$loader.hide();
                 app.$els.$actividades.fadeIn();
 				app.$els.$verTodo.hide();
             }
@@ -106,6 +109,8 @@ window.BMC = (function(window, document, $) {
                 datos.fecha_actividad ? $particular.find('.o-actividad__fecha-actividad').html(datos.fecha_actividad) : $particular.find('.o-actividad__fecha-actividad').html('');
                 datos.fecha_inicia ? $particular.find('.o-actividad__fecha-inicia').html("<b>Inicia:</b> " + datos.fecha_inicia).show() : $particular.find('.o-actividad__fecha-inicia').html('').hide();
                 datos.fecha_termina ? $particular.find('.o-actividad__fecha-termina').html("<b>Termina:</b> " + datos.fecha_termina).show() : $particular.find('.o-actividad__fecha-termina').html('').hide();
+
+                $particular.find('input').val('').hide();
 
                 if (datos.tipos) {
                     var tipos = datos.tipos;
@@ -184,12 +189,17 @@ window.BMC = (function(window, document, $) {
             return false;
         }
 
-        app.eventos.filtrar = function(e) {
-            if (app.$els.$particular.is(':visible')) {
-                app.eventos.volver(e);
-            }
+        app.eventos.compartirLink = function(e) {
+            e.preventDefault();
+            var $actividad = $(e.target).parents('.o-actividad');
+            app.$els.$inputLink.val(app.url + "?ac=" + $actividad.attr('data-id')).slideDown();
+            return false;
+        }
 
-            app.eventos.toggleLoader();
+        app.eventos.filtrar = function(e) {
+            app.eventos.volver(e);
+            app.$els.$loader.hide();
+            app.$els.$loader.fadeIn();
 
             var $this = $(this);
             var actividades = app.$els.$actividades;
@@ -198,10 +208,9 @@ window.BMC = (function(window, document, $) {
 
             filtro = $this.attr('data-filtro');
             id = $this.attr('data-id');
-
+            
             actividades.hide();
-
-            if (filtro == 'tipo' || filtro == 'disciplina') {
+            if (filtro == 'tipo' || filtro == 'disciplina' || filtro == 'audiencia' || filtro == 'fecha') {
                 for (var i = 0; i < cantidadActividades; i++) {
                     var ids = actividades.eq(i).attr('data-' + filtro).split('|');
                     ids.pop();
@@ -254,9 +263,16 @@ window.BMC = (function(window, document, $) {
         // Botones de redes sociales
         app.$els.$facebook.click(app.eventos.compartirFacebook);
         app.$els.$twitter.click(app.eventos.compartirTwitter);
+        app.$els.$link.click(app.eventos.compartirLink);
 
         // Eventos de filtrado
         app.$els.$document.on('click', '.c-dropdown__item', app.eventos.filtrar);
+        app.$els.$document.on('click', '.c-boton_fecha--semana', app.eventos.filtrar);
+        app.$els.$document.on('click', '.c-boton_fecha--mes', app.eventos.filtrar);
+        app.$els.$document.on('click', '.c-boton_fecha--ninguno', function (e) {
+            app.eventos.mostrarTodasActividades(e);
+            app.eventos.toggleSidebar(e);
+        });
         app.$els.$document.on('click', '#ver-todo', app.eventos.mostrarTodasActividades);
 		app.$els.$document.on('click', '#volver-ver-todo', app.eventos.mostrarTodasActividades);
 

@@ -6,6 +6,7 @@
  */
 get_header();
 
+$audiencias = $_POST['datos']['audiencias']['results'];
 $disciplinas = $_POST['datos']['disciplinas']['results'];
 $tipo_actividad = $_POST['datos']['tipo_actividad']['results'];
 $eventos = $_POST['datos']['eventos']['results'];
@@ -15,8 +16,8 @@ $actividades = $_POST['datos']['actividades']['results'];
 global $post;
 $color_buscador = get_post_meta($post->ID, 'color-buscador', true );
 $logo_buscador = get_post_meta($post->ID, 'logo-buscador', true );
+$audiencia_buscador = get_post_meta($post->ID, 'audiencia-buscador', true );
 $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images/logo-horizontal-blanco.png";
-
 ?>
 
 <?php if (!is_null($color_buscador)) : ?>
@@ -49,10 +50,11 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 						<div class="c-buscador__contenido">
 							<ul class="c-actividades">
 							<?php foreach($actividades as $key => $a) { ?>
-								<li data-id="<?= $a['id'] ?>" class="o-actividad" data-lugar="<?= $a['lugar']['id'] ?>" data-disciplina="<?= $a['disciplinas_ids'] ?>" data-tipo="<?= $a['tipos_ids'] ?>" data-evento="<?= $a['agrupador']['id'] ?>" >
+								<li data-id="<?= $a['id'] ?>" class="o-actividad" data-lugar="<?= $a['lugar']['id'] ?>" data-fecha="<?= $a['rango_fecha'] ?>" data-disciplina="<?= $a['disciplinas_ids'] ?>" data-audiencia="<?= $a['audiencias_ids'] ?>" data-tipo="<?= $a['tipos_ids'] ?>" data-evento="<?= $a['agrupador']['id'] ?>" >
 									<div class="o-actividad__informacion">
 										<h3 title="<?= $a['titulo'] ?>" class="o-actividad__titulo"><?= $a['nombre_corto'] ?></h3><span class="o-actividad__fecha-actividad"><?= $a['fecha_actividad'] ?></span>
 										<p><?= $a['descripcion'] ?></p>
+										<div class="o-actividad__degrade"></div>
 									</div>
 									<div class="o-actividad__contenedor-imagen"><img class="o-actividad__imagen" src="<?= $a['imagen_final'] ?>" /></div>
 								</li>
@@ -72,7 +74,11 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 									<p class="o-actividad__fecha-termina"></p>
 								</div>
 								<div class="c-social">
-									<span>Compartir: </span> <button class="c-social__boton c-social__boton--twitter">Twitter</button> <button class="c-social__boton c-social__boton--facebook">Facebook</button>
+									<span>Compartir: </span>
+									<button class="c-social__boton c-social__boton--twitter">Twitter</button>
+									<button class="c-social__boton c-social__boton--facebook">Facebook</button>
+									<button class="c-social__boton c-social__boton--link"></button>
+									<input class="c-social__link" type="text">
 								</div>
 								<a class="c-atras" href="#">Atrás</a>
 								<div class="o-actividad__contenedor-imagen"><img class="o-actividad__imagen" alt="Evento" src="<?=$_POST['URL_PLUGIN']."/images/evento-predeterminado.png"?>"></div>
@@ -91,10 +97,32 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 							</button>
 							<img class="c-sidebar__imagen" src="<?=$logo_buscador?>">
 						</div>
+						<div class="c-sidebar__nav">
+							<button class="c-boton_fecha c-boton_fecha--semana" data-filtro="fecha" data-id="semana">Semana</button>
+							<button class="c-boton_fecha c-boton_fecha--mes" data-filtro="fecha" data-id="mes">Mes</button>
+							<button class="c-boton_fecha c-boton_fecha--ninguno">Todo</button>
+						</div>
 						<ul class="c-sidebar__nav">
+							<?php if(!$audiencia_buscador || $audiencia_buscador < 1) { ?>
 							<li class="c-dropdown">
 								<a href="#" class="c-dropdown__link" data-toggle="dropdown">
-									Categoría<!-- <span class="c-sidebar__badge"></span>-->
+									Audiencia
+									<b class="c-dropdown__caret"></b>
+								</a>
+								<ul class="c-dropdown__menu">
+									<?php foreach($audiencias as $key => $a) { ?>
+									<li class="c-dropdown__item" data-filtro="audiencia" data-id="<?= $a['id'] ?>">
+										<a class="c-dropdown__link" href="#" tabindex="-1">
+											<?= $a['nombre'] ?>
+										</a>
+									</li>
+									<?php } ?>
+								</ul>
+							</li>
+							<?php } ?>
+							<li class="c-dropdown">
+								<a href="#" class="c-dropdown__link" data-toggle="dropdown">
+									Eventos<!-- <span class="c-sidebar__badge"></span>-->
 									<b class="c-dropdown__caret"></b>
 								</a>
 								<ul class="c-dropdown__menu">

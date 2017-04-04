@@ -7,30 +7,25 @@ Genera una plantilla de página que contiene un buscador de actividades pública
 
 Además, contiene los siguientes filtros:
 
+* Audiencia
 * Categoría (agrupadores de actividades)
 * Tipo de Actividad
 * Disciplinas
 * Lugares
 
+Provee también un shortcode para listar actividades por disciplina.
+
 ## Instalación
-------
 1. Colocar el directorio del plugin dentro de .../wp-content/plugins/
 2. Activar desde la página de plugins de la administración de Wordpress.
 
-## Uso
-------
+## Uso del Buscador
 Una vez activado el plugin, se debe añadir una página nueva y en la caja "Atributos de Página" seleccionar la plantilla "Buscador de Actividades". Luego, se debe publicar la página o guardarla como borrador.
-
-![](http://www.cordoba.gob.ar/wp-content/uploads/2016/12/buscador-actividades-uso.png)
 
 Una vez guardada, se habilita la caja de edición de "Estilos del Buscador", donde podrá cambiar el color del menú y los enlaces del buscador, y elegir un logo distinto. Esta caja aparecerá por encima de la caja "Publicar", pero puede acomodarla en otra posición.
 
 ### Imágenes
-![](http://www.cordoba.gob.ar/wp-content/uploads/2017/03/buscador-actividades-uso-estilos.png)
-
 Para insertar una imagen como logo, debe hacer click en el botón "Subir logo". Cuando haya cargado la imagen que desee, haga click en el botón "Insertar en la entrada":
-
-![](http://www.cordoba.gob.ar/wp-content/uploads/2017/03/buscador-actividades-uso-logo.png)
 
 Finalmente, no olvide guardar la página.
 
