@@ -8,6 +8,9 @@ Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
 
+setlocale(LC_ALL,"es_ES");
+date_default_timezone_set('America/Argentina/Cordoba');
+
 add_action('plugins_loaded', array('ActividadesMuniCordoba', 'get_instancia'));
 
 class ActividadesMuniCordoba
@@ -24,7 +27,8 @@ class ActividadesMuniCordoba
 	private static $URL_API_GOB_AB = 'https://gobiernoabierto.cordoba.gob.ar/api';
 	private static $ID_AUDIENCIA_CULTURA = 4;
 
-	private static $IMAGEN_PREDETERMINADA = '/images/evento-predeterminado.png';
+	private static $IMAGEN_PREDETERMINADA_BUSCADOR = '/images/evento-predeterminado.png';
+	private static $IMAGEN_PREDETERMINADA_LISTADO = '/images/listado-default.png';
 
 	protected $plantillas;
 
@@ -87,25 +91,77 @@ class ActividadesMuniCordoba
 	{
 	    $atributos = array_change_key_case((array)$atributos, CASE_LOWER);
 	    $atr = shortcode_atts([
-            'disciplina' => 3,
-            'cant' => 3,
-            'titulo' => ''
+            'disciplina' => 0,
+            'cant' => 0,
+            'titulo' => '',
+			'desde' => '',
+			'hasta' => '',
+			'query' => '',
+			'fecha' => '',
+			'orden' => ''
         ], $atributos, $tag);
 
-	    $url = self::$URL_API_GOB_AB.'/actividad-publica/?audiencia_id='.self::$ID_AUDIENCIA_CULTURA.'&disciplina_id='.$atr['disciplina'].'&page_size='.$atr['cant'];
+	    $filtro_disciplina = $atr['disciplina'] == 0 ? '' : '&disciplina_id='.$atr['disciplina'];
+	    $filtro_cantidad = $atr['cant'] == 0 ? '' : '&page_size='.$atr['cant'];
+		$filtro_query = trim($atr['query']) == '' ? '' : '&q='.$atr['query'];
+		$filtro_ordenamiento = trim($atr['orden']) != 'titulo' ? '' : '&ordering=titulo';
+		
+		$filtro_fecha = '';
+		if (trim($atr['fecha'])) {
+			$fecha_desde = str_replace('/','-',$atr['fecha']).'-00-00-00';
+			$fecha_hasta = str_replace('/','-',$atr['fecha']).'-23-59-59';
+			$filtro_fecha = '&inicia_GTE='.$fecha_desde.'&termina_LTE='.$fecha_hasta;
+		} elseif (trim($atr['desde']) || trim($atr['hasta'])) {
+			$fecha_desde = trim($atr['desde']) ? '&inicia_GTE='.str_replace('/','-',$atr['desde']).'-00-00-00' : '';
+			$fecha_hasta = trim($atr['hasta']) ? '&termina_LTE='.str_replace('/','-',$atr['hasta']).'-23-59-59' : '';
+			$filtro_fecha = $fecha_desde.$fecha_hasta;
+		}
+	
+	    $url = self::$URL_API_GOB_AB.'/actividad-publica/?audiencia_id='.self::$ID_AUDIENCIA_CULTURA.$filtro_disciplina.$filtro_cantidad.$filtro_query.$filtro_fecha.$filtro_ordenamiento;
 
     	$api_response = wp_remote_get($url);
     	$nombre_transient = 'actividades_disciplina_' . $atr['disciplina'];
 		$resultado = $this->chequear_respuesta($api_response, 'las disciplinas', $nombre_transient);
 		
-		// TODO: template
+		echo '<div id="listado-actividades" class="c-cultura">';
 		if ($atr['titulo']) {
-			echo '<h2>'.$atr['titulo'].'</h2>';
+			echo '<span class="c-titulo">';
+			echo do_shortcode('[vc_custom_heading text="'.$atr['titulo'].'" font_container="tag:h3|font_size:20|text_align:left|color:%23262626|line_height:64px" google_fonts="font_family:Montserrat%3Aregular%2C700|font_style:400%20regular%3A400%3Anormal"]');
+			echo '</span><span class="c-next"></span>';
 		}
+		echo '<div class="c-actividades">';
 
-		foreach ($resultado['results'] as $key => $actividad) {
-			echo $actividad['titulo'].'<br>';
+		if (count($resultado['results']) > 0) {
+			echo '<ul>';
+			foreach ($resultado['results'] as $key => $actividad) {
+				$url_evento = 'http://'.$_SERVER['SERVER_NAME'].'/evento/'.$actividad['id'];
+				$momento = $this->que_dia_es($actividad['inicia'], $actividad['termina']);
+				$imagen = '';
+				$estilo = '';
+				
+				if ($actividad['imagen']['original'] != '') {
+					$imagen = $actividad['imagen']['original'];
+					$estilo = 'background-size: cover;';
+				} else {
+					$imagen = plugins_url(self::$IMAGEN_PREDETERMINADA_BUSCADOR, __FILE__);
+				}
+					
+				echo	'<li class="o-actividad">'.
+						'<a href="'.$url_evento.'"><div class="o-actividad__imagen" style="'.$estilo.'background-image: url('.$imagen.');">'.
+						($momento ? '<div class="flag">'.$momento.'</div>' : '').
+						'</div></a>'.
+						'<div class="o-actividad__informacion">'.
+						'<a href="'.$url_evento.'" class="o-actividad__titulo">'.$actividad['titulo'].'</a>'.
+						'<p class="o-actividad__fecha-actividad">'.$this->formatear_fecha_listado($actividad['inicia']).'</p>'.
+						'<div class="o-actividad__descripcion ellipsis">'.$actividad['descripcion'].'</div>'.
+						'<div class="o-actividad__lugar"><span class="fa fa-map-marker"></span>'.$actividad['lugar']['nombre'].'<a href="'.$url_evento.'"><div class="more"></div></a></div>'.
+						'</div></li>';
+			}
+			echo '</ul>';
+		} else {
+			echo '<div class="c-resultado">No se encontraron actividades.</div>';
 		}
+		echo '</div></div>';
 	}
 
 	public function boton_shortcode_lista_actividades() {
@@ -190,9 +246,11 @@ class ActividadesMuniCordoba
 
 	public function cargar_assets()
 	{
+		$urlCSSShortcode = $this->cargar_url_asset('/css/shortcode.css');
 		$urlCSSBuscador = $this->cargar_url_asset('/css/buscador.css');
 		$urlJSBuscador = $this->cargar_url_asset('/js/buscador.js');
 
+		wp_register_style('listado_actividades.css', $urlCSSShortcode);
 		wp_register_style('buscador_actividades.css', $urlCSSBuscador);
 		wp_register_script('buscador_actividades.js', $urlJSBuscador);
 
@@ -219,10 +277,12 @@ class ActividadesMuniCordoba
 				array(
 					'url'   => admin_url('admin-ajax.php'),
 					'nonce' => $nonce_busquedas,
-					'imagen' => plugins_url(self::$IMAGEN_PREDETERMINADA, __FILE__),
+					'imagen' => plugins_url(self::$IMAGEN_PREDETERMINADA_BUSCADOR, __FILE__),
 					'audiencia' => $audiencia_buscador
 				)
 			);
+		} else {
+			wp_enqueue_style('listado_actividades.css', $urlCSSShortcode);
 		}
 	}
 
@@ -300,7 +360,7 @@ class ActividadesMuniCordoba
 			}
 			$datos['actividades']['results'][$key]['nombre_corto'] = $nombre;
 			
-			$datos['actividades']['results'][$key]['imagen_final'] = $ac['imagen'] ? $ac['imagen']['thumbnail'] : plugins_url(self::$IMAGEN_PREDETERMINADA, __FILE__);
+			$datos['actividades']['results'][$key]['imagen_final'] = $ac['imagen'] ? $ac['imagen']['thumbnail'] : plugins_url(self::$IMAGEN_PREDETERMINADA_BUSCADOR, __FILE__);
 			
 			$datos['actividades']['results'][$key]['descripcion'] = $this->quitar_palabras($this->url_a_link($ac['descripcion']), 20);
 			
@@ -608,9 +668,31 @@ class ActividadesMuniCordoba
 		return $fecha;
 	}
 
+	private function formatear_fecha_listado($timestamp)
+	{
+		$fecha = strtotime($timestamp);
+		return strftime("%e de %B, %Y", $fecha); // 7 de Abril, 2017
+	}
+
 	private function traducir_meses($texto)
 	{
 		return str_ireplace(self::$MONTHS, self::$MESES, $texto);
+	}
+
+	private function que_dia_es($timestamp_inicio, $timestamp_fin)
+	{
+		$fecha_inicio = date('Y.m.d', strtotime($timestamp_inicio));
+		$fecha_fin = date('Y.m.d', strtotime($timestamp_fin));
+		$hoy = date('Y.m.d');
+		$maniana = date('Y.m.d', strtotime('+1 day'));
+		
+		if ($fecha_inicio == $maniana) {
+			return 'MA&Ntilde;ANA';
+		} elseif ($fecha_inicio <= $hoy) {
+			return 'HOY';
+		} else {
+			return false;
+		}
 	}
 
 	private function cargar_url_asset($ruta_archivo)
