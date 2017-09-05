@@ -3,7 +3,7 @@
 Plugin Name: Buscador de actividad p&uacute;blica de la Municipalidad de C&oacute;rdoba
 Plugin URI: https://github.com/ModernizacionMuniCBA/plugin-wordpress-actividad-publica
 Description: Este plugin genera una plantilla para incluir en una p&aacute;gina un buscador de actividades p&uacute;blicas de la Municipalidad de C&oacute;rdoba.
-Version: 1.3.82
+Version: 1.3.83
 Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
@@ -113,6 +113,7 @@ class ActividadesMuniCordoba
 		$filtro_evento = $atr['evento'] == 0 ? '' : '&evento_id='.$atr['evento'];
 		$filtro_participante = $atr['participante'] == 0 ? '' : '&participante_id='.$atr['participante'];
 	    $filtro_cantidad = $atr['cant'] == 0 ? '' : '&page_size='.$atr['cant'];
+		$limitado = $atr['cant'] != 0;
 		$filtro_query = trim($atr['query']) == '' ? '' : '&q='.$atr['query'];
 		$filtro_ordenamiento = trim($atr['orden']) != 'titulo' ? '' : '&ordering=titulo';
 		
@@ -202,7 +203,7 @@ class ActividadesMuniCordoba
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/10.0.1/lazyload.min.js"></script>';
 			
 				echo '<style>
-				img.loading {
+				.o-actividad img.loading {
 					background-image: url(\''.plugins_url("actividad-publica-municipalidad-cordoba").'/images/loading.gif'.'\');
 					background-size: auto !important;
 					background-position: center;
@@ -214,7 +215,7 @@ class ActividadesMuniCordoba
 				(function($){
 					var lazy = new LazyLoad();';
 
-			if ($resultado['next'] != '') {
+			if ($resultado['next'] != '' && !$limitado) {
 					echo 'var $elem;
 					var $lista = $(".c-actividades ul");
 					
