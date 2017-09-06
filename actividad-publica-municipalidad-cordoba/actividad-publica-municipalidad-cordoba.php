@@ -3,7 +3,7 @@
 Plugin Name: Buscador de actividad p&uacute;blica de la Municipalidad de C&oacute;rdoba
 Plugin URI: https://github.com/ModernizacionMuniCBA/plugin-wordpress-actividad-publica
 Description: Este plugin genera una plantilla para incluir en una p&aacute;gina un buscador de actividades p&uacute;blicas de la Municipalidad de C&oacute;rdoba.
-Version: 1.3.84
+Version: 1.3.85
 Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
@@ -190,11 +190,10 @@ class ActividadesMuniCordoba
 					
 				echo	'<li class="o-actividad">'.
 						'<a href="'.$url_evento.'"><div class="o-actividad__imagen" style="height:225px">
-							<img with="300px" height="225px"  alt="'.$actividad['titulo'].'" style="width:100%;height:225px;'.$estilo.'" data-src="'.$imagen.'">'.
-						($momento ? '<div class="flag">'.$momento.'</div>' : '').
-						'</div></a>'.
-						'<div class="o-actividad__informacion">'.
-						'<a href="'.$url_evento.'" class="o-actividad__titulo">'.$actividad['titulo'].'</a>'.
+							<img with="300px" height="225px"  alt="'.$actividad['titulo'].'" style="width:100%;height:225px;'.$estilo.'" data-src="'.$imagen.'">
+						</div></a>
+						<div class="o-actividad__informacion">'.
+						'<div class="o-actividad__cabecera"><a href="'.$url_evento.'" class="o-actividad__titulo">'.$actividad['titulo'].'</a>'.($momento ? '<div class="flag">'.$momento.'</div>' : '').'</div>'.
 						'<p class="o-actividad__fecha-actividad">'.$this->formatear_fecha_listado($actividad['inicia']).'</p>'.
 						'<div class="o-actividad__descripcion ellipsis">'.$actividad['descripcion'].'</div>'.
 						'<div class="o-actividad__lugar"><span class="fa fa-map-marker"></span>'.$actividad['lugar']['nombre'].'<a href="'.$url_evento.'"><div class="more"></div></a></div>'.
