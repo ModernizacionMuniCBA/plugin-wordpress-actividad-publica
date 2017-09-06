@@ -3,7 +3,7 @@
 Plugin Name: Buscador de actividad p&uacute;blica de la Municipalidad de C&oacute;rdoba
 Plugin URI: https://github.com/ModernizacionMuniCBA/plugin-wordpress-actividad-publica
 Description: Este plugin genera una plantilla para incluir en una p&aacute;gina un buscador de actividades p&uacute;blicas de la Municipalidad de C&oacute;rdoba.
-Version: 1.3.83
+Version: 1.3.84
 Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
@@ -170,16 +170,18 @@ class ActividadesMuniCordoba
 					
 					foreach ($actividad['repeticiones'] as $key => $r) {
 						
-						$momento_aux = $this->que_dia_es($r['inicia'],$r['termina']);
-						
-						if ($momento_aux == 'HOY') {
-							$es_hoy = true;
-							$momento = 'HOY';
-							break;
-						}
-						if ($momento_aux == 'MA&Ntilde;ANA') {
-							$momento = 'MA&Ntilde;ANA';
-							$es_maniana = true;
+						if (!($this->es_pasado($r['inicia']) && $this->es_pasado($r['inicia']))) {
+							$momento_aux = $this->que_dia_es($r['inicia'],$r['termina']);
+							
+							if ($momento_aux == 'HOY') {
+								$es_hoy = true;
+								$momento = 'HOY';
+								break;
+							}
+							if ($momento_aux == 'MA&Ntilde;ANA') {
+								$momento = 'MA&Ntilde;ANA';
+								$es_maniana = true;
+							}
 						}
 					}
 				} else {
@@ -783,6 +785,14 @@ class ActividadesMuniCordoba
 	private function traducir_meses($texto)
 	{
 		return str_ireplace(self::$MONTHS, self::$MESES, $texto);
+	}
+	
+	
+	private function es_pasado($timestamp)
+	{
+		$fecha = date('Y.m.d', strtotime($timestamp));
+		$hoy = date('Y.m.d');
+		return $fecha < $hoy;
 	}
 
 	private function que_dia_es($timestamp_inicio, $timestamp_fin)
