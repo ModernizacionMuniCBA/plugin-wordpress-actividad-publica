@@ -433,8 +433,6 @@ class ActividadesMuniCordoba
 
 		$datos['tipo_actividad'] = $this->buscar_transient('tipo_actividad');
 
-		$datos['eventos'] = $this->buscar_transient('eventos');
-
 		$datos['lugares'] = $this->buscar_transient('lugares');
 
 		$datos['actividades'] = $this->buscar_transient('actividades');
@@ -542,10 +540,6 @@ class ActividadesMuniCordoba
 				case 'tipo_actividad': {
 					$api_response = wp_remote_get(self::$URL_API_GOB_AB.'/tipo-actividad/'.$audiencia_buscador_param);
 					$resultado = $this->chequear_respuesta($api_response, 'los tipos de actividad', $nombre_transient);
-				} break;
-				case 'eventos': {
-					$api_response = wp_remote_get(self::$URL_API_GOB_AB.'/agrupador-actividad/'.$audiencia_buscador_param);
-					$resultado = $this->chequear_respuesta($api_response, 'los eventos', $nombre_transient);
 				} break;
 				case 'lugares': {
 					$api_response = wp_remote_get(self::$URL_API_GOB_AB.'/lugar-actividad/'.$audiencia_buscador_param);
@@ -770,8 +764,8 @@ class ActividadesMuniCordoba
 
 	private function formatear_fecha_inicio_fin($timestamp)
 	{
-		$fecha = date_format(date_create($timestamp),'j \d\e M\, g:i A');
-		$fecha = $this->traducir_meses($fecha); // 1 de Ene, 7:00 PM
+		$fecha = strftime("%e %h, %H:%M hs.", strtotime($timestamp));
+		$fecha = $this->traducir_meses($fecha);
 		return $fecha;
 	}
 

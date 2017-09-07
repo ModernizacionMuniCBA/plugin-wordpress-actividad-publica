@@ -577,7 +577,7 @@ x-fast
 #bmc .c-hamburger {
     position: absolute;
     left: 0;
-    padding: 10px 10px 4px;
+    padding: 0 10px 4px;
     display: inline-block;
     cursor: pointer;
     transition-property: opacity, filter;

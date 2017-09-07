@@ -9,7 +9,6 @@ get_header();
 $audiencias = $_POST['datos']['audiencias']['results'];
 $disciplinas = $_POST['datos']['disciplinas']['results'];
 $tipo_actividad = $_POST['datos']['tipo_actividad']['results'];
-$eventos = $_POST['datos']['eventos']['results'];
 $lugares = $_POST['datos']['lugares']['results'];
 $actividades = $_POST['datos']['actividades']['results'];
 
@@ -50,7 +49,7 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 						<div class="c-buscador__contenido">
 							<ul class="c-actividades">
 							<?php foreach($actividades as $key => $a) { ?>
-								<li data-id="<?= $a['id'] ?>" class="o-actividad" data-lugar="<?= $a['lugar']['id'] ?>" data-fecha="<?= $a['rango_fecha'] ?>" data-disciplina="<?= $a['disciplinas_ids'] ?>" data-audiencia="<?= $a['audiencias_ids'] ?>" data-tipo="<?= $a['tipos_ids'] ?>" data-evento="<?= $a['agrupador']['id'] ?>" >
+								<li data-id="<?= $a['id'] ?>" class="o-actividad" data-lugar="<?= $a['lugar']['id'] ?>" data-fecha="<?= $a['rango_fecha'] ?>" data-disciplina="<?= $a['disciplinas_ids'] ?>" data-audiencia="<?= $a['audiencias_ids'] ?>" data-tipo="<?= $a['tipos_ids'] ?>" >
 									<div class="o-actividad__informacion">
 										<h3 title="<?= $a['titulo'] ?>" class="o-actividad__titulo"><?= $a['nombre_corto'] ?></h3><span class="o-actividad__fecha-actividad"><?= $a['fecha_actividad'] ?></span>
 										<p><?= $a['descripcion'] ?></p>
@@ -106,7 +105,7 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 							<?php if(!$audiencia_buscador || $audiencia_buscador < 1) { ?>
 							<li class="c-dropdown">
 								<a href="#" class="c-dropdown__link" data-toggle="dropdown">
-									Audiencia
+									Público
 									<b class="c-dropdown__caret"></b>
 								</a>
 								<ul class="c-dropdown__menu">
@@ -120,21 +119,6 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 								</ul>
 							</li>
 							<?php } ?>
-							<li class="c-dropdown">
-								<a href="#" class="c-dropdown__link" data-toggle="dropdown">
-									Eventos<!-- <span class="c-sidebar__badge"></span>-->
-									<b class="c-dropdown__caret"></b>
-								</a>
-								<ul class="c-dropdown__menu">
-									<?php foreach($eventos as $key => $e) { ?>
-									<li class="c-dropdown__item" data-filtro="evento" data-id="<?= $e['id'] ?>">
-										<a class="c-dropdown__link" href="#" tabindex="-1">
-											<?= $e['nombre'] ?>
-										</a>
-									</li>
-									<?php } ?>
-								</ul>
-							</li>
 							<li class="c-dropdown">
 								<a href="#" class="c-dropdown__link" data-toggle="dropdown">
 									Tipo de Actividad
@@ -181,7 +165,7 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 								</ul>
 							</li>
 						</aside>
-						
+						<span style="margin: 9px;font-size: 10px;">MENU</span>
 						<button class="c-hamburger c-hamburger--3dx" tabindex="0" type="button">
 							<span class="c-hamburger__contenido">
 								<span class="c-hamburger__interno"></span>
