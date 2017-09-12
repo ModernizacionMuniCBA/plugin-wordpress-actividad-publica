@@ -3,7 +3,7 @@
 Plugin Name: Buscador de actividad p&uacute;blica de la Municipalidad de C&oacute;rdoba
 Plugin URI: https://github.com/ModernizacionMuniCBA/plugin-wordpress-actividad-publica
 Description: Este plugin genera una plantilla para incluir en una p&aacute;gina un buscador de actividades p&uacute;blicas de la Municipalidad de C&oacute;rdoba.
-Version: 1.3.85
+Version: 1.3.86
 Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
@@ -46,16 +46,16 @@ class ActividadesMuniCordoba
 	{
 		$this->plantillas = array();
 		// Agrega un filtro al metabox de atributos para inyectar la plantilla en el cache.
-			if (version_compare(floatval(get_bloginfo('version')), '4.7', '<')) { // 4.6 y anteriores
+		if (version_compare(floatval(get_bloginfo('version')), '4.7', '<')) { // 4.6 y anteriores
+			add_filter(
+				'page_attributes_dropdown_pages_args',
+				array($this, 'registrar_plantillas')
+			);
+		} else { // Version 4.7
 				add_filter(
-					'page_attributes_dropdown_pages_args',
-					array($this, 'registrar_plantillas')
+					'theme_page_templates', array($this, 'agregar_plantilla_nueva')
 				);
-			} else { // Version 4.7
-					add_filter(
-						'theme_page_templates', array($this, 'agregar_plantilla_nueva')
-					);
-			}
+		}
 		// Agregar un filtro al save post para inyectar plantilla al cache de la página
 		add_filter(
 			'wp_insert_post_data', 
@@ -162,6 +162,7 @@ class ActividadesMuniCordoba
 					$imagen = plugins_url(self::$IMAGEN_PREDETERMINADA_BUSCADOR, __FILE__);
 				}
 				
+				$fecha_principal = $actividad['inicia'];
 				$momento = '';
 				if (!empty($actividad['repeticiones'])) {
 					$es_hoy = false;
@@ -170,22 +171,30 @@ class ActividadesMuniCordoba
 					
 					foreach ($actividad['repeticiones'] as $key => $r) {
 						
-						if (!($this->es_pasado($r['inicia']) && $this->es_pasado($r['inicia']))) {
+						$ya_inicio = $this->es_pasado($r['inicia']);
+						$ya_termino = $this->es_pasado($r['termina']);
+						
+						if (!($ya_inicio && $ya_termino)) {
 							$momento_aux = $this->que_dia_es($r['inicia'],$r['termina']);
 							
 							if ($momento_aux == 'HOY') {
 								$es_hoy = true;
 								$momento = 'HOY';
+								$fecha_principal = date('Y-m-d', time());
 								break;
-							}
-							if ($momento_aux == 'MA&Ntilde;ANA') {
+							} elseif ($momento_aux == 'MA&Ntilde;ANA') {
 								$momento = 'MA&Ntilde;ANA';
 								$es_maniana = true;
+							} else {
+								$fecha_principal = $r['inicia'];
 							}
 						}
 					}
 				} else {
 					$momento = $this->que_dia_es($actividad['inicia'], $actividad['termina']);
+					if ($momento == 'HOY' && $this->es_pasado($fecha_principal)) {
+						$fecha_principal = date('Y-m-d', time());
+					}
 				}
 					
 				echo	'<li class="o-actividad">'.
@@ -194,7 +203,7 @@ class ActividadesMuniCordoba
 						</div></a>
 						<div class="o-actividad__informacion">'.
 						'<div class="o-actividad__cabecera"><a href="'.$url_evento.'" class="o-actividad__titulo">'.$actividad['titulo'].'</a>'.($momento ? '<div class="flag">'.$momento.'</div>' : '').'</div>'.
-						'<p class="o-actividad__fecha-actividad">'.$this->formatear_fecha_listado($actividad['inicia']).'</p>'.
+						'<p class="o-actividad__fecha-actividad">'.$this->formatear_fecha_listado($fecha_principal).'</p>'.
 						'<div class="o-actividad__descripcion ellipsis">'.$actividad['descripcion'].'</div>'.
 						'<div class="o-actividad__lugar"><span class="fa fa-map-marker"></span>'.$actividad['lugar']['nombre'].'<a href="'.$url_evento.'"><div class="more"></div></a></div>'.
 						'</div></li>';

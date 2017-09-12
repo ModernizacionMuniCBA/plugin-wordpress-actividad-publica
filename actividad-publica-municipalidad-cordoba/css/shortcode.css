@@ -59,16 +59,18 @@
 
 #listado-actividades .o-actividad .o-actividad__cabecera .flag{
 	background-color: #f98b0c;
-	display: block;
-	padding: 10px 15px;
+	box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.25);
 	color: #FFF;
+	display: block;
+	flex: 0 0 auto;
 	font-size: 1.1em;
 	font-family: 'Roboto', serif;
 	font-weight: 500;
 	height:46px;
+	padding: 10px 15px;
+	position:relative;
 	margin-right: 10px;
-	box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.25);
-	flex: 0 0 auto;
+	top: -10px;
 }
 
 #listado-actividades .o-actividad .o-actividad__cabecera .o-actividad__titulo{
