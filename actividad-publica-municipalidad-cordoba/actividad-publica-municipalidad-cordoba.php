@@ -119,15 +119,15 @@ class ActividadesMuniCordoba
 		
 		$filtro_fecha = '';
 		if (trim($atr['fecha'])) {
-			$fecha_desde = str_replace('/','-',$atr['fecha']).'-00-00-00';
-			$fecha_hasta = str_replace('/','-',$atr['fecha']).'-23-59-59';
-			$filtro_fecha = '&inicia_GTE='.$fecha_desde.'&inicia_LTE='.$fecha_hasta;
+			$fecha_inicia = str_replace('/','-',$atr['fecha']).'-23-59-59';
+			$fecha_termina = str_replace('/','-',$atr['fecha']).'-23-59-59';
+			$filtro_fecha = '&inicia_LTE='.$fecha_inicia.'&termina_GTE='.$fecha_termina;
 		} elseif (trim($atr['desde']) || trim($atr['hasta'])) {
 			$fecha_desde = trim($atr['desde']) ? '&inicia_GTE='.str_replace('/','-',$atr['desde']).'-00-00-00' : '';
 			$fecha_hasta = trim($atr['hasta']) ? '&inicia_LTE='.str_replace('/','-',$atr['hasta']).'-23-59-59' : '';
 			$filtro_fecha = $fecha_desde.$fecha_hasta;
 		}
-	
+		
 	    $url = self::$URL_API_GOB_AB.'/actividad-publica/?audiencia_id='.self::$ID_AUDIENCIA_CULTURA.$filtro_agrupador.$filtro_evento.$filtro_tipo.$filtro_disciplina.$filtro_lugar.$filtro_participante.$filtro_cantidad.$filtro_query.$filtro_fecha.$filtro_ordenamiento;
 
     	$api_response = wp_remote_get($url);
