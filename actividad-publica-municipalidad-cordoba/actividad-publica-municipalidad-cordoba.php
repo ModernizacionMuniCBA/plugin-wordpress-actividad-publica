@@ -103,7 +103,8 @@ class ActividadesMuniCordoba
 			'hasta' => '',
 			'query' => '',
 			'fecha' => '',
-			'orden' => ''
+			'orden' => '',
+			'audiencia' => '4'
         ], $atributos, $tag);
 
 	    $filtro_disciplina = $atr['disciplina'] == 0 ? '' : '&disciplina_id='.$atr['disciplina'];
@@ -114,8 +115,9 @@ class ActividadesMuniCordoba
 		$filtro_participante = $atr['participante'] == 0 ? '' : '&participante_id='.$atr['participante'];
 	    $filtro_cantidad = $atr['cant'] == 0 ? '' : '&page_size='.$atr['cant'];
 		$limitado = $atr['cant'] != 0;
-		$filtro_query = trim($atr['query']) == '' ? '' : '&q='.$atr['query'];
-		$filtro_ordenamiento = trim($atr['orden']) != 'titulo' ? '' : '&ordering=titulo';
+		$filtro_query = trim($atr['query']) == '' ? '' : '&q='.trim($atr['query']);
+		$filtro_ordenamiento = trim($atr['orden']) != 'titulo' ? '' : trim('&ordering=titulo');
+		$filtro_audiencia = trim($atr['audiencia']) <= 0 ? '' : '&audiencia_id='.trim($atr['audiencia']);
 		
 		$filtro_fecha = '';
 		if (trim($atr['fecha'])) {
@@ -127,13 +129,13 @@ class ActividadesMuniCordoba
 			$fecha_hasta = trim($atr['hasta']) ? '&inicia_LTE='.str_replace('/','-',$atr['hasta']).'-23-59-59' : '';
 			$filtro_fecha = $fecha_desde.$fecha_hasta;
 		}
-		
-	    $url = self::$URL_API_GOB_AB.'/actividad-publica/?audiencia_id='.self::$ID_AUDIENCIA_CULTURA.$filtro_agrupador.$filtro_evento.$filtro_tipo.$filtro_disciplina.$filtro_lugar.$filtro_participante.$filtro_cantidad.$filtro_query.$filtro_fecha.$filtro_ordenamiento;
+
+	    $url = self::$URL_API_GOB_AB.'/actividad-publica/?a=0'.$filtro_audiencia.$filtro_agrupador.$filtro_evento.$filtro_tipo.$filtro_disciplina.$filtro_lugar.$filtro_participante.$filtro_cantidad.$filtro_query.$filtro_fecha.$filtro_ordenamiento;
 
     	$api_response = wp_remote_get($url);
     	$nombre_transient = 'actividades_disciplina_' . $atr['disciplina'];
 		$resultado = $this->chequear_respuesta($api_response, 'las disciplinas', $nombre_transient);
-		
+
 		echo '<div id="listado-actividades" class="c-cultura">';
 		if ($atr['titulo']) {
 			echo '<span class="c-titulo">';
