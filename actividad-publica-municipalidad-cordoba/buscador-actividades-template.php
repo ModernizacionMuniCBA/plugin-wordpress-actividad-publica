@@ -48,14 +48,43 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 					<div class="c-buscador__cuerpo">
 						<div class="c-buscador__contenido">
 							<ul class="c-actividades">
-							<?php foreach($actividades as $key => $a) { ?>
+							<?php
+							foreach($actividades as $key => $a) {
+								$lugar = isset($a['lugar']['nombre']) ? $a['lugar']['nombre'] : '';
+								?>
 								<li data-id="<?= $a['id'] ?>" class="o-actividad" data-lugar="<?= $a['lugar']['id'] ?>" data-fecha="<?= $a['rango_fecha'] ?>" data-disciplina="<?= $a['disciplinas_ids'] ?>" data-audiencia="<?= $a['audiencias_ids'] ?>" data-tipo="<?= $a['tipos_ids'] ?>" >
-									<div class="o-actividad__informacion">
-										<h3 title="<?= $a['titulo'] ?>" class="o-actividad__titulo"><?= $a['nombre_corto'] ?></h3><span class="o-actividad__fecha-actividad"><?= $a['fecha_actividad'] ?></span>
-										<p><?= $a['descripcion'] ?></p>
-										<div class="o-actividad__degrade"></div>
+								  <div class="o-actividad__informacion">
+									<div class="o-actividad__contenedor-link">
+										<div class="o-actividad__contenedor-imagen"><img class="o-actividad__imagen" src="<?= $a['imagen_final'] ?>" /></div>
+										<div class="o-actividad__contenedor-datos">
+											<div class="o-actividad__contenedor-fecha">
+											<?php
+												$fecha_separada = explode(' / ',$a['fecha_actividad']);
+												$calendario1 = '';
+												$calendario2 = '';
+												if (count($fecha_separada) == 2) {
+													$fechas1 = explode(" ",$fecha_separada[0]);
+													$fechas2 = explode(" ",$fecha_separada[1]);
+													$calendario1 = '<div class="e-fecha"><div class="mes">' . $fechas1[0] . '</div><div class="dia">' . $fechas1[1] . '</div></div>';
+													$calendario2 = '<div class="e-fecha"><div class="mes">' . $fechas2[0] . '</div><div class="dia">' . $fechas2[1] . '</div></div>';
+												} else {
+													$fechas1 = explode(" ",$fecha_separada[0]);
+													$calendario1 = '<div class="e-fecha"><div class="mes">' . $fechas1[0] . '</div><div class="dia">' . $fechas1[1] . '</div></div>';
+												}
+												
+											?>
+												<span class="o-actividad__fecha-actividad"><?= $calendario1.$calendario2 ?></span>
+											</div>
+											<div class="o-actividad__contenedor-descripcion">
+												<h3 title="<?= $a['titulo'] ?>" class="o-actividad__titulo"><?= $a['nombre_corto'] ?></h3>
+												<p class="o-actividad__lugar"><?= $lugar ?></p>
+											</div>
+										</div>
 									</div>
-									<div class="o-actividad__contenedor-imagen"><img class="o-actividad__imagen" src="<?= $a['imagen_final'] ?>" /></div>
+									<div class="o-actividad__contenedor-botones">
+										<a href="http://www.google.com/calendar/event?action=TEMPLATE&text=<?= str_replace('"','&quot;',$a['titulo']) ?>&dates=<?=str_replace([':','-'], "",$a['inicia'])?>/<?=str_replace([':','-'], "",$a['termina'])?>&details=<?= strip_tags($a['descripcion']) ?>&location=<?= $lugar ?>&trp=false&sprop=&sprop=name:" target="_blank" rel="nofollow" class="o-actividad__boton-calendario"><span class="icono icono-calendario"></span> <span>Agendar</span></a>
+									</div>
+								  </div>
 								</li>
 							<?php } ?>
 							</ul>
@@ -63,24 +92,39 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 						<img class="c-loading" src="<?=$_POST['URL_PLUGIN']."/images/loading.gif"?>" alt="Cargando..." />
 						<div class="c-actividades--particular">
 							<div data-id="" class="o-actividad o-actividad--particular">
+								<div class="o-actividad--particular__contenedor-imagen"><img class="o-actividad--particular__imagen" alt="Evento" src="<?=$_POST['URL_PLUGIN']."/images/evento-predeterminado.png"?>"></div>
 								<div class="o-actividad--particular__informacion">
-									<h3 title="" class="o-actividad__titulo"></h3><span class="o-actividad__fecha-actividad"></span>
+									<h3 title="" class="o-actividad__titulo"></h3>
+									<a class="c-atras" href="#">Atrás</a>
 									<p class="o-actividad__evento"></p>
 									<p class="c-tipos"></p>
+									<div class="o-actividad__contenedor">
+										<div class="o-actividad__icono"><span class="icono icono-pin"></span></div>
+										<div>
+											<p class="o-actividad__lugar"></p>
+										</div>
+									</div>
+									<div class="o-actividad__contenedor">
+										<div class="o-actividad__icono"><span class="icono icono-reloj"></span></div>
+										<div>
+											<p class="o-actividad__fecha-inicia"></p>
+											<p class="o-actividad__fecha-termina"></p>
+										</div>
+									</div>
+									<div class="o-actividad__contenedor --precios" style="display:none">
+										<div class="o-actividad__icono"><span class="icono icono-precio"></span></div>
+										<div class="o-actividad--particular__precios">
+										</div>
+									</div>
+									<div class="c-social">
+										<a href="#" target="_blank" rel="nofollow" class="o-actividad__boton-calendario"><span class="icono icono-calendario"></span> <span>Agendar</span></a>
+										<button class="c-social__boton c-social__boton--link"></button>
+										<button class="c-social__boton c-social__boton--twitter">Twitter</button>
+										<button class="c-social__boton c-social__boton--facebook">Facebook</button>
+										<input class="c-social__link" type="text">
+									</div>
 									<p class="o-actividad__descripcion"></p>
-									<p class="o-actividad__lugar"></p>
-									<p class="o-actividad__fecha-inicia"></p>
-									<p class="o-actividad__fecha-termina"></p>
 								</div>
-								<div class="c-social">
-									<span>Compartir: </span>
-									<button class="c-social__boton c-social__boton--twitter">Twitter</button>
-									<button class="c-social__boton c-social__boton--facebook">Facebook</button>
-									<button class="c-social__boton c-social__boton--link"></button>
-									<input class="c-social__link" type="text">
-								</div>
-								<a class="c-atras" href="#">Atrás</a>
-								<div class="o-actividad__contenedor-imagen"><img class="o-actividad__imagen" alt="Evento" src="<?=$_POST['URL_PLUGIN']."/images/evento-predeterminado.png"?>"></div>
 							</div>
 						</div>
 						<div class="c-mensaje"><p></p><a class="c-atras" href="#">Atrás</a></div>

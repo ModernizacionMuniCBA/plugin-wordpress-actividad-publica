@@ -22,6 +22,7 @@ window.BMC = (function(window, document, $) {
 
         app.url = window.location.protocol + "//" + window.location.hostname + window.location.pathname;
         app.idAnterior = 1;
+        app.urlGoogleCalendar = "";
         app.sinResultados = false;
 
         app.eventos = {
@@ -102,7 +103,12 @@ window.BMC = (function(window, document, $) {
                 $particular.find('.o-actividad--particular').attr('data-id', datos.id);
                 $particular.find('.o-actividad__titulo').html(datos.titulo);
                 datos.descripcion ? $particular.find('.o-actividad__descripcion').html(datos.descripcion) : $particular.find('.o-actividad__descripcion').html('');
-                datos.imagen != '' ? $particular.find('img').attr('src', datos.imagen.thumbnail) : $particular.find('img').attr('src', buscarActividad.imagen);
+
+                let imagenFinal = datos.flyer != '' ? datos.flyer.original : false;
+                if (!imagenFinal) {
+                    imagenFinal = datos.imagen != '' ? datos.imagen.original : buscarActividad.imagen;
+                }
+                $particular.find('img').attr('src', imagenFinal);
 
                 datos.agrupador ? $particular.find('.o-actividad__evento').html('<b>' + datos.agrupador.nombre + '<b>').show() : $particular.find('.o-actividad__evento').html('').hide();
 
@@ -111,6 +117,7 @@ window.BMC = (function(window, document, $) {
                 datos.fecha_termina ? $particular.find('.o-actividad__fecha-termina').html("<b>Termina:</b> " + datos.fecha_termina).show() : $particular.find('.o-actividad__fecha-termina').html('').hide();
 
                 $particular.find('input').val('').hide();
+                $particular.find('.o-actividad__boton-calendario').attr("href", app.urlGoogleCalendar);
 
                 if (datos.tipos) {
                     var tipos = datos.tipos;
@@ -122,7 +129,28 @@ window.BMC = (function(window, document, $) {
                 } else {
                     $particular.find('.c-tipos').html('').hide();
                 }
-                datos.lugar ? $particular.find('.o-actividad__lugar').html('<b>Lugar:</b> ' + datos.lugar.nombre + (datos.lugar.descripcion && " (" + datos.lugar.descripcion + ")")).show() : $particular.find('.o-actividad__lugar').html('').hide();
+                datos.lugar ? $particular.find('.o-actividad__lugar').html('<b>Lugar:</b> ' + datos.lugar.nombre).show() : $particular.find('.o-actividad__lugar').html('').hide();
+
+                let precios = false;
+
+                if (datos.precios.length > 0) {
+                    if (datos.precios.length == 1 && datos.precios[0].grupo.nombre == "Todos" && datos.precios[0].valor == "0.00") {
+                        precios = '<p class="o-actividad__precio .o-actividad__precio--gratis">Gratis</p>';
+                    } else {
+                        precios = '';
+                        for (let i = 0; i < datos.precios.length; i++) {
+                            precios += '<p class="o-actividad__precio"><b>'+datos.precios[i].grupo.nombre+':</b> $ '+datos.precios[i].valor+(datos.precios[i].detalles ? " - " + datos.precios[i].detalles : "")+'</p>';
+                        }
+                    }
+                }
+
+                if (precios) {
+                    $particular.find('.--precios').show();
+                    $particular.find('.o-actividad--particular__precios').html(precios);
+                } else {
+                    $particular.find('.o-actividad--particular__precios').html('');
+                    $particular.find('.--precios').hide();
+                }
 
                 app.idAnterior = datos.id;
 
@@ -170,6 +198,7 @@ window.BMC = (function(window, document, $) {
 
             if ($(e.target).parents('li').attr('data-id') != app.idAnterior) {
                 app.eventos.buscarResultado($(e.target).parents('li'));
+                app.urlGoogleCalendar = $(e.target).parents('li').find('.o-actividad__boton-calendario').attr("href");
             } else {
                 app.$els.$particular.fadeIn();
             }
@@ -250,7 +279,7 @@ window.BMC = (function(window, document, $) {
         app.$els.$hamburger.on('click', app.eventos.toggleSidebar);
         app.$els.$dropdownLinks.on('click', app.eventos.toggleDropdown);
         app.$els.$document.keyup(app.eventos.cerrarSidebarEsc);
-        app.$els.$document.on('click', '.c-buscador__contenido .o-actividad', app.eventos.clickEnActividad);
+        app.$els.$document.on('click', '.c-buscador__contenido .o-actividad .o-actividad__contenedor-link', app.eventos.clickEnActividad);
         app.$els.$document.on('click', '#reintentar', function(e) {
             e.preventDefault();
             app.eventos.buscarResultadoAjax({

@@ -3,7 +3,7 @@
 Plugin Name: Buscador de actividad p&uacute;blica de la Municipalidad de C&oacute;rdoba
 Plugin URI: https://github.com/ModernizacionMuniCBA/plugin-wordpress-actividad-publica
 Description: Este plugin genera una plantilla para incluir en una p&aacute;gina un buscador de actividades p&uacute;blicas de la Municipalidad de C&oacute;rdoba.
-Version: 1.3.86
+Version: 1.3.9
 Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
@@ -475,9 +475,13 @@ class ActividadesMuniCordoba
 			}
 			$datos['actividades']['results'][$key]['nombre_corto'] = $nombre;
 			
-			$datos['actividades']['results'][$key]['imagen_final'] = $ac['imagen'] ? $ac['imagen']['thumbnail'] : plugins_url(self::$IMAGEN_PREDETERMINADA_BUSCADOR, __FILE__);
+			$flyer = $ac['flyer'] ? $ac['flyer']['thumbnail_400x400'] : false;
+
+			$imagen_final = !$flyer ? ($ac['imagen'] ? $ac['imagen']['original'] : plugins_url(self::$IMAGEN_PREDETERMINADA_BUSCADOR, __FILE__)) : $flyer;
 			
-			$datos['actividades']['results'][$key]['descripcion'] = $this->quitar_palabras($this->url_a_link($ac['descripcion']), 20);
+			$datos['actividades']['results'][$key]['imagen_final'] = $imagen_final;
+			
+			$datos['actividades']['results'][$key]['descripcion'] = $this->quitar_palabras($ac['descripcion'], 20);
 			
 			if ($ac['inicia']) {
 				$iniciaFormat = $this->formatear_fecha_tres_caracteres($ac['inicia']);
@@ -609,7 +613,6 @@ class ActividadesMuniCordoba
 
 	private function mejorar_contenido_actividad($actividad)
 	{
-		$actividad['descripcion'] = $this->url_a_link($actividad['descripcion']);
 		if ($actividad['inicia']) {
 			$iniciaFormat = $this->formatear_fecha_tres_caracteres($actividad['inicia']);
 			$terminaFormat = $this->formatear_fecha_tres_caracteres($actividad['termina']);
@@ -757,13 +760,6 @@ class ActividadesMuniCordoba
 			$resultado = implode(" ", $arreglo) . "...";
 		}
 		return $resultado;
-	}
-
-	private function url_a_link($texto)
-	{
-		$texto = strip_tags($texto, '<br><p>');
-		$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
-		return preg_match($reg_exUrl, $texto, $url) ? preg_replace($reg_exUrl, "<a target='_blank' href='" . $url[0] . "'>" . (strlen($url[0]) > 30 ? substr($url[0], 0, 29).'...' : $url[0]) . "</a> ", $texto) : $texto;
 	}
 
 	private function formatear_fecha_tres_caracteres($timestamp)
