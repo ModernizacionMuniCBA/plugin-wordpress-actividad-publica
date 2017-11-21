@@ -3,7 +3,7 @@
 Plugin Name: Buscador de actividad p&uacute;blica de la Municipalidad de C&oacute;rdoba
 Plugin URI: https://github.com/ModernizacionMuniCBA/plugin-wordpress-actividad-publica
 Description: Este plugin genera una plantilla para incluir en una p&aacute;gina un buscador de actividades p&uacute;blicas de la Municipalidad de C&oacute;rdoba.
-Version: 1.3.9
+Version: 1.3.10
 Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
@@ -486,9 +486,10 @@ class ActividadesMuniCordoba
 			if ($ac['inicia']) {
 				$iniciaFormat = $this->formatear_fecha_tres_caracteres($ac['inicia']);
 				$terminaFormat = $this->formatear_fecha_tres_caracteres($ac['termina']);
-
+				
 				$datos['actividades']['results'][$key]['fecha_actividad'] = $iniciaFormat == $terminaFormat ? $iniciaFormat : $iniciaFormat . ' / ' . $terminaFormat;
 			}
+			
 			// Cadena con los ids de los tipos de la actividad.
 			$ids = "";
 			foreach ($ac['tipos'] as $keyTipo => $tipo) {
@@ -764,7 +765,7 @@ class ActividadesMuniCordoba
 
 	private function formatear_fecha_tres_caracteres($timestamp)
 	{
-		$fecha = date_format(date_create($timestamp),"M j");
+		$fecha = strftime("%b %d", strtotime($timestamp));
 		$fecha = $this->traducir_meses($fecha); // Ene 1
 		return $fecha;
 	}
