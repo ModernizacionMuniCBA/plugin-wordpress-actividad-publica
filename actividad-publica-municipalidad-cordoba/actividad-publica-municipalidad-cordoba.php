@@ -3,7 +3,7 @@
 Plugin Name: Buscador de actividad p&uacute;blica de la Municipalidad de C&oacute;rdoba
 Plugin URI: https://github.com/ModernizacionMuniCBA/plugin-wordpress-actividad-publica
 Description: Este plugin genera una plantilla para incluir en una p&aacute;gina un buscador de actividades p&uacute;blicas de la Municipalidad de C&oacute;rdoba.
-Version: 1.3.10
+Version: 1.3.12
 Author: Florencia Peretti
 Author URI: https://github.com/florenperetti/
 */
@@ -104,6 +104,7 @@ class ActividadesMuniCordoba
 			'query' => '',
 			'fecha' => '',
 			'orden' => '',
+			'link' => '',
 			'audiencia' => '4'
         ], $atributos, $tag);
 
@@ -138,9 +139,16 @@ class ActividadesMuniCordoba
 
 		echo '<div id="listado-actividades" class="c-cultura">';
 		if ($atr['titulo']) {
+			$link = '';
+			$next = '<span class="c-next"></span>';
+			if ($atr['link']) {
+				$link = ' link="url:'.$atr['link'].'|||"';
+				$next = '<a class="c-next__link" href="'.$atr['link'].'" title="Ver todas"><span class="c-next"></span></a>';
+			}
+			
 			echo '<span class="c-titulo">';
-			echo do_shortcode('[vc_custom_heading text="'.$atr['titulo'].'" font_container="tag:h3|font_size:20|text_align:left|color:%23262626|line_height:64px" google_fonts="font_family:Montserrat%3Aregular%2C700|font_style:400%20regular%3A400%3Anormal"]');
-			echo '</span><span class="c-next"></span>';
+			echo do_shortcode('[vc_custom_heading text="'.$atr['titulo'].'" font_container="tag:h3|font_size:20|text_align:left|color:%23262626|line_height:64px" google_fonts="font_family:Montserrat%3Aregular%2C700|font_style:400%20regular%3A400%3Anormal"'.$link.']');
+			echo '</span>'.$next;
 		}
 		echo '<div class="c-actividades">';
 
@@ -485,7 +493,7 @@ class ActividadesMuniCordoba
 			
 			if ($ac['inicia']) {
 				$iniciaFormat = $this->formatear_fecha_tres_caracteres($ac['inicia']);
-				$terminaFormat = $this->formatear_fecha_tres_caracteres($ac['termina']);
+				$terminaFormat = $ac['termina'] ? $this->formatear_fecha_tres_caracteres($ac['termina']) : $iniciaFormat;
 				
 				$datos['actividades']['results'][$key]['fecha_actividad'] = $iniciaFormat == $terminaFormat ? $iniciaFormat : $iniciaFormat . ' / ' . $terminaFormat;
 			}
@@ -616,8 +624,8 @@ class ActividadesMuniCordoba
 	{
 		if ($actividad['inicia']) {
 			$iniciaFormat = $this->formatear_fecha_tres_caracteres($actividad['inicia']);
-			$terminaFormat = $this->formatear_fecha_tres_caracteres($actividad['termina']);
-
+			$terminaFormat = $actividad['termina'] ? $this->formatear_fecha_tres_caracteres($actividad['termina']) : $iniciaFormat;
+			
 			$actividad['fecha_actividad'] = $iniciaFormat == $terminaFormat ? $iniciaFormat : $iniciaFormat . ' / ' . $terminaFormat;
 		}
 		$actividad['fecha_inicia'] = $actividad['inicia'] ? $this->formatear_fecha_inicio_fin($actividad['inicia']) : '';

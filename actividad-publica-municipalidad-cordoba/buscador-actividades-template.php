@@ -82,7 +82,8 @@ $logo_buscador = $logo_buscador ? $logo_buscador : $_POST['URL_PLUGIN']."/images
 										</div>
 									</div>
 									<div class="o-actividad__contenedor-botones">
-										<a href="http://www.google.com/calendar/event?action=TEMPLATE&text=<?= str_replace('"','&quot;',$a['titulo']) ?>&dates=<?=str_replace([':','-'], "",$a['inicia'])?>/<?=str_replace([':','-'], "",$a['termina'])?>&details=<?= strip_tags($a['descripcion']) ?>&location=<?= $lugar ?>&trp=false&sprop=&sprop=name:" target="_blank" rel="nofollow" class="o-actividad__boton-calendario"><span class="icono icono-calendario"></span> <span>Agendar</span></a>
+										<?php $inicia = substr($a['inicia'], 0, -6); $termina = $a['termina'] ? substr($a['termina'], 0, -6) : $a['inicia'];?>
+										<a href="http://www.google.com/calendar/event?action=TEMPLATE&text=<?= str_replace('"','&quot;',$a['titulo']) ?>&dates=<?=str_replace([':','-'], "",$inicia)?>/<?=str_replace([':','-'], "",$termina)?>&details=<?= strip_tags($a['descripcion']) ?>&location=<?= $lugar ?>&trp=false&sprop=&sprop=name:" target="_blank" rel="nofollow" class="o-actividad__boton-calendario"><span class="icono icono-calendario"></span> <span>Agendar</span></a>
 									</div>
 								  </div>
 								</li>
